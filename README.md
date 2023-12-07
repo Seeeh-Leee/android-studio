@@ -9,4 +9,6 @@ The message has secured with AES256 method by simply using EncryptedSharedPrefer
 You can see the app demo.
 [<img src="[android-studio/BSM-3-sehyeon lee.mov](https://github.com/Seeeh-Leee/android-studio/blob/main/BSM-3-sehyeon%20lee.gif)https://github.com/Seeeh-Leee/android-studio/blob/main/BSM-3-sehyeon%20lee.gif" width="50%"] DEMO>)
 
+[<img src="BSM-3-sehyeon lee.gif" width="50%">](/<VIDEO>)
+
 
