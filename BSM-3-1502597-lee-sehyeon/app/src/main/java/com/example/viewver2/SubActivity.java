@@ -22,7 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SubActivity extends AppCompatActivity {
-    public static String new_password = "1234";
     public String note_msg="origin";
 
     TextView textview, note_view;
@@ -92,15 +91,39 @@ public class SubActivity extends AppCompatActivity {
                     // wrong password
                     if(!Password_Validation(password_change)){
                         Toast.makeText(SubActivity.this, "Check the alert", Toast.LENGTH_LONG).show();
-                        textview.setText("<!-- alert-->\n*The password must be at least 8 characters long" +
-                                " and contain capital letters, lowercase letters, " +
-                                "special characters, and numbers*");
+                        textview.setText("<!-- alert-->\n*The password must be at least 8 characters long");
                     }
                     else {
                         Toast.makeText(SubActivity.this, "Password has changed", Toast.LENGTH_LONG).show();
 
                         Intent intent = new Intent(SubActivity.this, MainActivity.class);
-                        new_password = password_change;
+
+                        MasterKey masterkey = null;
+                        try {
+                            masterkey = new MasterKey.Builder(getApplicationContext(), MasterKey.DEFAULT_MASTER_KEY_ALIAS)
+                                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                                    .build();
+                        } catch (GeneralSecurityException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        SharedPreferences sharedPreferences = null;
+                        try {
+                            sharedPreferences = EncryptedSharedPreferences
+                                    .create(getApplicationContext(),
+                                            "filename",
+                                            masterkey,
+                                            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+                        } catch (GeneralSecurityException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        SharedPreferences.Editor spfEditor = sharedPreferences.edit();
+
+
                         startActivity(intent);
                     }
                 } else
@@ -161,17 +184,18 @@ public class SubActivity extends AppCompatActivity {
     {
         if(password.length()>=8)
         {
-            Pattern sLetter = Pattern.compile("[a-z]");
-            Pattern bLetter = Pattern.compile("[A-z]");
-            Pattern digit = Pattern.compile("[0-9]");
-            Pattern special = Pattern.compile ("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
+//            Pattern sLetter = Pattern.compile("[a-z]");
+//            Pattern bLetter = Pattern.compile("[A-z]");
+//            Pattern digit = Pattern.compile("[0-9]");
+//            Pattern special = Pattern.compile ("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
+//
+//            Matcher hassLetter = sLetter.matcher(password);
+//            Matcher hasbLetter = bLetter.matcher(password);
+//            Matcher hasDigit = digit.matcher(password);
+//            Matcher hasSpecial = special.matcher(password);
 
-            Matcher hassLetter = sLetter.matcher(password);
-            Matcher hasbLetter = bLetter.matcher(password);
-            Matcher hasDigit = digit.matcher(password);
-            Matcher hasSpecial = special.matcher(password);
-
-            return hassLetter.find() && hasbLetter.find() && hasDigit.find() && hasSpecial.find();
+//            return hassLetter.find() && hasbLetter.find() && hasDigit.find() && hasSpecial.find();
+            return true;
         }
         else
             return false;

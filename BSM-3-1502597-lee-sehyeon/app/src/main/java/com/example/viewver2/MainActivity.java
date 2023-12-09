@@ -1,8 +1,11 @@
 package com.example.viewver2;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.security.crypto.EncryptedSharedPreferences;
+import androidx.security.crypto.MasterKey;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -11,7 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +38,34 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                correct_password = SubActivity.new_password; //1234 불러옴
+                MasterKey masterkey = null;
+                try {
+                    masterkey = new MasterKey.Builder(getApplicationContext(), MasterKey.DEFAULT_MASTER_KEY_ALIAS)
+                            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+                            .build();
+                } catch (GeneralSecurityException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                SharedPreferences sharedPreferences = null;
+                try {
+                    sharedPreferences = EncryptedSharedPreferences
+                            .create(getApplicationContext(),
+                                    "filename",
+                                    masterkey,
+                                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM);
+                } catch (GeneralSecurityException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+
+                String correct_password = sharedPreferences.getString("password", "");
+
+                if (correct_password.length() ==0) correct_password = "12341234";
                 String input_password = password.getText().toString();
 
                 //validate password
@@ -47,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                         String text = password.getText().toString();
                         intent.putExtra("password", text);
                         startActivity(intent);
-
                 }
                 else
                     Toast.makeText(MainActivity.this, "Invalid", Toast.LENGTH_LONG).show();

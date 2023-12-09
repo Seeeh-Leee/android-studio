@@ -48,7 +48,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="*The initial password is 1234"
+        android:hint="*The initial password is 12341234"
         android:layout_marginStart="24dp"
         android:layout_marginTop="140dp"
         app:layout_constraintStart_toStartOf="parent"
